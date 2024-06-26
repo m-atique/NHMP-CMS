@@ -8,46 +8,99 @@ router.post("/saveRequest", (req, res) => {
   const data = req.body;
    
   
-  const insertquery  = `INSERT INTO requestedAccounts (  tName,
-     tFName, tCnic, tBg, tDob, tQualification,
-    tDomicile, tPA, tCA, tContact,tCourse, tEmgcontact,
-     tRelation, tBeltno, tRank, tDL, tDLno, tDLissuedBy,
-    tHeight, 
-     tJoinService,
-      tJoinNHMP,
-       tArrivalCollege, tExp, tReligion, tPosting,addedDate,status)
+  const insertquery  = `INSERT INTO requestedAccounts (  
+    traineeId,
+    tName,
+    tFName,
+    maritalState,
+    gender,
+    pwd,
+    email,
+    tCnic,
+    tBg,
+    tDob,
+    tQualification,
+    degreeName,
+    institute,
+    province,
+    tDomicile,
+    localPs,
+    tPA,
+    tCA,
+    tContact,
+    tEmgcontact,
+    tRelation,
+    emgpesrson,
+    tRank,
+    tPic,
+    tCourse,
+    tBeltno,
+    tDL,
+    tDLno,
+    tDLissuedBy,
+    tMedical,
+    tHeight,
+    tJoinService,
+    tJoinNHMP,
+    tArrivalCollege,
+    tExp,
+    tReligion,
+    tPosting,
+    remarks,
+    addedBy,
+    addedDate,
+    status,
+    employment,
+    deparment,
+    deputation,
+    induction)
 VALUES
-    (
-       
-        '${data.tName}', 
-        '${data.tFName}',
-        '${data.tCnic}',
-        '${data.tBg}',
-        '${data.tDob}',
-        '${data.tQualification}',
-        '${data.tDomicile}',
-        '${data.tPA}',
-        '${data.tCA}',
-        '${data.tContact}',
-        '${data.tCourse}',
-        '${data.tEmgcontact}',
-        '${data.tRelation}',
-        '${data.tBeltno}',
-        '${data.tRank}',
-        '${data.tDL}',
-        '${data.tDLno}',
-        '${data.tDLissuedBy}',
-        '${data.tHeight}',
-        '${data.tJoinService}',
-        '${data.tJoinNHMP}',
-        '${data.tArrivalCollege}',
-        '${data.tExp}',
-        '${data.tReligion}',
-        '${data.tPosting}',
-        '${data.addedDate}',
-        '${data.status}'
-
-        )`
+(   
+    '${data.traineeId}',
+    '${data.tName}',
+    '${data.tFName}',
+    '${data.maritalState}',
+    '${data.gender}',
+    '${data.pwd}',
+    '${data.email}',
+    '${data.tCnic}',
+    '${data.tBg}',
+    '${data.tDob}',
+    '${data.tQualification}',
+    '${data.degreeName}',
+    '${data.institute}',
+    '${data.province}',
+    '${data.tDomicile}',
+    '${data.localPs}',
+    '${data.tPA}',
+    '${data.tCA}',
+    '${data.tContact}',
+    '${data.tEmgcontact}',
+    '${data.tRelation}',
+    '${data.emgpesrson}',
+    '${data.tRank}',
+    '${data.tPic}',
+    '${data.tCourse}',
+    '${data.tBeltno}',
+    '${data.tDL}',
+    '${data.tDLno}',
+    '${data.tDLissuedBy}',
+    '${data.tMedical}',
+    '${data.tHeight}',
+    '${data.tJoinService}',
+    '${data.tJoinNHMP}',
+    '${data.tArrivalCollege}',
+    '${data.tExp}',
+    '${data.tReligion}',
+    '${data.tPosting}',
+    '${data.remarks}',
+    '${data.addedBy}',
+    '${data.addedDate}',
+    '${data.status}',
+    '${data.employment}',
+    '${data.deparment}',
+    '${data.deputation}',
+    '${data.induction}')`
   
   try{
       db.query(insertquery,(err, result) => {
@@ -71,9 +124,10 @@ VALUES
 
     const update_Qry = `UPDATE requestedAccounts set 
     status ='${data.status}'
-    where id =  '${id}'`;
+    where tCnic =  '${id}'`;
 
 try{
+  console.log(update_Qry)
     db.query(update_Qry,(err, result) => {
       if (err) {
         res.sendStatus(500); // Internal Server Error

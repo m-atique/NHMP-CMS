@@ -47,6 +47,30 @@ router.get("/getRanks", (req, res) => {
   }
 });
 
+
+
+
+
+//--------------------------------province and district 
+
+router.get("/getpd", (req, res) => {
+
+
+  const qry = `SELECT * from prv_dist`;
+
+  try {
+    db.query(qry, (err, result) => {
+      if (err) {
+        res.sendStatus(500); // Internal Server Error
+      } else {
+        res.send(result.recordset); // OK
+      }
+    });
+  } catch (error) {
+    console.log("ALERT", error);
+  }
+});
+
 router.get("/getCourse", (req, res) => {
 
 

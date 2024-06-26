@@ -9,7 +9,7 @@ lmskey = process.env.KEY
 
 router.get("/getuser/:id", (req, res)=>{
     const userid = req.params.id
-    const q = `SELECT * from users where userId = '${userid}'`
+    const q = `SELECT * from requestedAccounts where tCnic = '${userid}'`
 
     try {
         db.query(q,(err, result)=>{
@@ -22,6 +22,24 @@ router.get("/getuser/:id", (req, res)=>{
     } catch (err) {
         console.log("query not working", err)
     }
+})
+
+
+router.get("/getTrainee/:cnic", (req, res)=>{
+  const cnic = req.params.cnic
+  const q = `SELECT * from requestedAccounts where tCnic = '${cnic}'`
+
+  try {
+      db.query(q,(err, result)=>{
+          if(result) { res.send(result.recordset)}
+          else {
+              console.log("errrrrrrrr",err)
+          }
+      })
+
+  } catch (err) {
+      console.log("query not working", err)
+  }
 })
 
 

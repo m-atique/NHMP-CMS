@@ -20,8 +20,9 @@ app.use('/gen',require('./routes/genRoutes'))
 app.use('/ofc',require('./routes/officeRoutes'))
 app.use('/signUp',require('./routes/signupRoutes'))
 app.use('/bk',require('./routes/getbooks'))
+app.use('/traineeRpt',require('./reports/traineeReports'))
 app.get("/", (req, res)=>{
     res.send("Welcome to CMS")
 })
 
-app.listen('5000', ()=>{console.log("server started at http://localhost:"+5000)})
+app.listen('5002', ()=>{console.log("server started at http://localhost:"+5002)})

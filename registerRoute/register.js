@@ -8,32 +8,86 @@ router.post("/TraineeRegisteration", (req, res)=>{
     // console.log(data);
     
 
-    const q = `INSERT INTO registeration( traineeId, tName, tFName, tCnic, tBg, tDob, tQualification,
-    tDomicile, tPA, tCA, tContact, tEmgcontact, tRelation, tBeltno, tRank, tDL, tDLno, tDLissuedBy,
-    tHeight, tMedical, tJoinService, tJoinNHMP, tArrivalCollege, tExp, tReligion, tPosting, remarks,
-    addedBy,addedDate)
+    const q = `INSERT INTO registeration(
+        id,
+        traineeId,
+        tName,
+        tFName,
+        maritalState,
+        gender,
+        pwd,
+        email,
+        tCnic,
+        tBg,
+        tDob,
+        tQualification,
+        degreeName,
+        institute,
+        province,
+        tDomicile,
+        localPs,
+        tPA,
+        tCA,
+        tContact,
+        tEmgcontact,
+        tRelation,
+        emgpesrson,
+        tRank,
+        tPic,
+        tCourse,
+        tBeltno,
+        tDL,
+        tDLno,
+        tDLissuedBy,
+        tMedical,
+        tHeight,
+        tJoinService,
+        tJoinNHMP,
+        tArrivalCollege,
+        tExp,
+        tReligion,
+        tPosting,
+        remarks,
+        addedBy,
+        addedDate,
+        status,
+        employment,
+        deparment,
+        deputation,
+        induction)
 VALUES
-    (
+    (   '${data.id}',
         '${data.traineeId}',
-        '${data.tName}', 
+        '${data.tName}',
         '${data.tFName}',
+        '${data.maritalState}',
+        '${data.gender}',
+        '${data.pwd}',
+        '${data.email}',
         '${data.tCnic}',
         '${data.tBg}',
         '${data.tDob}',
         '${data.tQualification}',
+        '${data.degreeName}',
+        '${data.institute}',
+        '${data.province}',
         '${data.tDomicile}',
+        '${data.localPs}',
         '${data.tPA}',
         '${data.tCA}',
         '${data.tContact}',
         '${data.tEmgcontact}',
         '${data.tRelation}',
-        '${data.tBeltno}',
+        '${data.emgpesrson}',
         '${data.tRank}',
+        '${data.tPic}',
+        '${data.tCourse}',
+        '${data.tBeltno}',
         '${data.tDL}',
         '${data.tDLno}',
         '${data.tDLissuedBy}',
-        '${data.tHeight}',
         '${data.tMedical}',
+        '${data.tHeight}',
         '${data.tJoinService}',
         '${data.tJoinNHMP}',
         '${data.tArrivalCollege}',
@@ -42,8 +96,12 @@ VALUES
         '${data.tPosting}',
         '${data.remarks}',
         '${data.addedBy}',
-        '${data.addedDate}'
-        )`
+        '${data.addedDate}',
+        '${data.status}',
+        '${data.employment}',
+        '${data.deparment}',
+        '${data.deputation}',
+        '${data.induction}')`
 
     try {
         db.query(q,(err, result)=>{
@@ -84,3 +142,6 @@ router.get("/getRegAccounts", (req, res)=>{
 
 
 module.exports = router
+
+
+
