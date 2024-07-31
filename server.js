@@ -20,6 +20,7 @@ app.use('/gen',require('./routes/genRoutes'))
 app.use('/ofc',require('./routes/officeRoutes'))
 app.use('/signUp',require('./routes/signupRoutes'))
 app.use('/bk',require('./routes/getbooks'))
+app.use('/trainee',require('./routes/trainees'))
 app.use('/traineeRpt',require('./reports/traineeReports'))
 app.get("/", (req, res)=>{
     res.send("Welcome to CMS")

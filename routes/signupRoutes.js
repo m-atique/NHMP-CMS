@@ -121,10 +121,17 @@ VALUES
   router.patch("/updateSignup/:userId",  (req, res) => {
     const data = req.body;
     const id =  req.params.userId
-
-    const update_Qry = `UPDATE requestedAccounts set 
-    status ='${data.status}'
-    where tCnic =  '${id}'`;
+    let update_Qry
+    if(data.tablename=='requestedAccounts'){
+      update_Qry = `UPDATE requestedAccounts set 
+      status ='${data.status}'
+      where tCnic =  '${id}'`;
+    }
+    if(data.tablename=='trainees'){
+      update_Qry = `UPDATE trainees set 
+      status ='${data.status}'
+      where tCnic =  '${id}'`;
+    }
 
 try{
   console.log(update_Qry)
@@ -149,10 +156,17 @@ try{
     router.get('/accountReq',(req,res)=>{
      
     
-        const qry = `select req.*,ofc.region,ofc.zone,ofc.sector,ofc.beat from requestedAccounts as req
+        const qry = `select  'requestedAccounts' AS table_name,  req.*,ofc.region,ofc.zone,ofc.sector,ofc.beat from requestedAccounts as req
         inner join
         offices as ofc 
-        on req.tposting = ofc.officeId where req.status = 'Approval Pending' order by tCourse `;
+        on req.tposting = ofc.officeId where req.status = 'Approval Pending'
+
+		UNION ALL
+
+		select  'trainees' AS table_name,  t.*,ofc.region,ofc.zone,ofc.sector,ofc.beat from trainees as t
+        inner join
+        offices as ofc 
+        on t.tposting = ofc.officeId where t.status = 'Approval Pending' order by tCourse `;
 
         try{
           db.query(qry,(err, result) => {
