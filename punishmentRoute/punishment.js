@@ -8,7 +8,7 @@ router.post("/addPunishment", (req, res)=>{
     // console.log(data);
     
 
-    const q = `INSERT INTO punishment( traineeID,punishment,days,reason,remarks, orderBy, addedBy, addedDate)
+    const q = `INSERT INTO punishment( traineeID,punishment,days,reason,remarks, orderBy, addedBy, addedDate,courseName)
 VALUES
     (
         '${data.traineeId}', 
@@ -18,7 +18,8 @@ VALUES
         '${data.remarks}',
         '${data.orderBy}',
         '${data.addedBy}',
-        '${data.addedDate}'
+        '${data.addedDate}',
+        '${data.courseName}'
         )`
 
     try {

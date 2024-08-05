@@ -8,7 +8,7 @@ router.post("/addAbsence", (req, res)=>{
     console.log(data);
     
 
-    const q = `INSERT INTO absence( traineeID,startDate,endDate,days,reason,remarks,addedBy, addedDate)
+    const q = `INSERT INTO absence( traineeID,startDate,endDate,days,reason,remarks,addedBy, addedDate,courseName)
 VALUES
     (
         '${data.traineeId}', 
@@ -18,7 +18,8 @@ VALUES
         '${data.reason}',
         '${data.remarks}',
         '${data.addedBy}',
-        '${data.addedDate}'
+        '${data.addedDate}',
+         '${data.courseName}'
         )`
 
     try {

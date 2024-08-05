@@ -55,7 +55,7 @@ router.post('/login',(req,res)=>{
 if( api_key !=lmskey){
   res.send("Invalid api key")
 }else{
-  const getuserById = `select u.id,u.pwd,u.role,t.tName,t.tCourse,t.tRank from users as u inner join trainees as t on u.userId = t.tCnic  where userId= ${userId}`;
+  const getuserById = `select u.id ,t.tCnic,u.pwd,u.role,t.tName,t.tCourse,t.tRank from users as u inner join trainees as t on u.userId = t.tCnic  where userId= ${userId}`;
 
 
   try{
@@ -73,8 +73,11 @@ if( api_key !=lmskey){
               name: data.tName,
               role:data.role,
               rank:data.tRank,
-              course:data.tCourse
-            }                      
+              course:data.tCourse,
+              cnic:data.tCnic
+            }  
+            
+            console.log(user)
           const token = jwt.sign({user},api_key,{expiresIn:'8h'})
           res.json({token})
           }
@@ -95,6 +98,73 @@ if( api_key !=lmskey){
    
 }
 })
+
+
+
+router.post('/updatePwd',(req,res)=>{
+
+ 
+  const {api_key} =req.headers
+  const userId = req.body.cnic
+  const pwd  = req.body.pwd
+  const dob  = req.body.dob
+   
+if( api_key !=lmskey){
+  res.send("Invalid api key")
+}else{
+  const getuserById = `select tDob from trainees  where tCnic= ${userId}`;
+  const update_pwd  = `update users set pwd = ${pwd}   where userId= ${userId}`;
+
+
+
+  try{
+      db.query(getuserById ,(err, result) => {
+        if (err) {
+          console.log(err);
+          res.sendStatus(500) //Internal Server Error
+        } else {
+          if (result){
+            const data = result.recordset[0]
+            if (data){
+            
+              if (dob == (data.tDob).toISOString().split("T")[0]){
+           
+                try{
+                  db.query(update_pwd ,(err, result) => {
+                    if (err) {
+                      console.log(err);
+                      res.sendStatus(500) //Internal Server Error
+                    }else{
+                      if(result){
+
+                        res.send("Success")
+                      }
+                    }
+                  })}catch (error) {
+                      console.log("ALERT",error) 
+                     }
+
+
+         
+          }
+          else{
+            res.send("Wrong Date of Birth")
+          }
+        }
+        else{
+          res.send("No User Found")
+        }
+      } 
+  
+        }
+      });
+    } catch (error) {
+      console.log("ALERT",error) 
+     }
+   
+}
+})
+
 
 router.post("/verifyUser", verifyToken, (req, res) => {
   const data = req.body

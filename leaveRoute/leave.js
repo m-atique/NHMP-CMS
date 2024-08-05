@@ -8,7 +8,7 @@ router.post("/addleave", (req, res)=>{
     console.log(data);
     
 
-    const q = `INSERT INTO leave( traineeID,startDate,endDate,days,reason,leaveType,remarks,approvedBy,addedBy, addedDate)
+    const q = `INSERT INTO leave( traineeID,startDate,endDate,days,reason,leaveType,remarks,approvedBy,addedBy, addedDate,courseName)
 VALUES
     (
         '${data.traineeId}', 
@@ -20,7 +20,8 @@ VALUES
         '${data.remarks}',
         '${data.approvedBy}',
         '${data.addedBy}',
-        '${data.addedDate}'
+        '${data.addedDate}',
+        '${data.courseName}'
         )`
 
     try {
@@ -38,21 +39,24 @@ VALUES
 
 
 
-// router.post("/saveuser", (req, res)=>{
-//     const data = req.body;
-//     const q = `INSERT INTO login (name, password) values( ${data}, ${data} )`
+router.get("/getTraineeLeave/:cnic", (req, res)=>{
+   const  cnic = req.params.cnic
+    const q = `SELECT * from leave where traineeId = '${cnic}' `
 
-//     try {
-//         db.query(q,(err, result)=>{
-//             if(result) { res.send(result.recordset)}
-//             else {
-//                 console.log("errrrrrrrr",err)
-//             }
-//         })
+    try {
+        db.query(q,(err, result)=>{
+            if(result) { res.send(result.recordset)}
+            else {
+                console.log("errrrrrrrr",err)
+            }
+        })
 
-//     } catch (err) {
-//         console.log("query not working", err)
-//     }
-// })
+    } catch (err) {
+        console.log("query not working", err)
+    }
+})
+
+
+
 
 module.exports = router

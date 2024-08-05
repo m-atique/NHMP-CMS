@@ -107,4 +107,25 @@ router.get("/get_max_id/:table/:fld", (req, res) => {
   }
 });
 
+
+router.post("/getLPR/", (req, res)=>{
+  const  cnic = req.body.traineeId
+  const  table = req.body.tableName
+  
+   const q = `SELECT * from ${table} where traineeId = '${cnic}' `
+
+   try {
+       db.query(q,(err, result)=>{
+           if(result) { res.send(result.recordset)}
+           else {
+               console.log("errrrrrrrr",err)
+           }
+       })
+
+   } catch (err) {
+       console.log("query not working", err)
+   }
+})
+
+
 module.exports = router;

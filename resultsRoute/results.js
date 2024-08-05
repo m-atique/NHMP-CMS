@@ -8,7 +8,7 @@ router.post("/addResult", (req, res)=>{
     console.log(data);
     
 
-    const q = `INSERT INTO results( traineeId,status,obMarks,totalMarks,position,remarks,addedBy, addedDate)
+    const q = `INSERT INTO results( traineeId,status,obMarks,totalMarks,position,remarks,addedBy, addedDate,courseName)
 VALUES
     (
         '${data.traineeId}', 
@@ -18,7 +18,8 @@ VALUES
         '${data.position}',
         '${data.remarks}',
         '${data.addedBy}',
-        '${data.addedDate}'
+        '${data.addedDate}',
+        '${data.courseName}'
         )`
 
     try {
