@@ -38,10 +38,45 @@ VALUES
 })
 
 
+//========================update leave
 
+router.post("/updateLeave/:id", (req, res) => {
+    const id = req.params.id
+    const data = req.body;
+    console.log(data);
+
+    const q = `UPDATE leave 
+               SET 
+                   startDate = '${data.startDate}', 
+                   endDate = '${data.endDate}', 
+                   days = '${data.days}', 
+                   reason = '${data.reason}', 
+                   leaveType = '${data.leaveType}', 
+                   remarks = '${data.remarks}', 
+                   approvedBy = '${data.approvedBy}', 
+                   addedBy = '${data.addedBy}', 
+                   addedDate = '${data.addedDate}', 
+                   courseName = '${data.courseName}'
+               WHERE 
+                   id = '${id}'`;
+
+    try {
+        db.query(q, (err, result) => {
+            if (result.rowsAffected>0) {
+                res.send('Updated');
+            } else {
+                console.log("Data not updated", err);
+            }
+        });
+    } catch (err) {
+        console.log("Query not working", err);
+    }
+});
+
+//====================================================
 router.get("/getTraineeLeave/:cnic", (req, res)=>{
    const  cnic = req.params.cnic
-    const q = `SELECT * from leave where traineeId = '${cnic}' `
+    const q = `SELECT * from leave where traineeId = '${cnic}' and recStatus= 'saved' `
 
     try {
         db.query(q,(err, result)=>{
@@ -55,6 +90,7 @@ router.get("/getTraineeLeave/:cnic", (req, res)=>{
         console.log("query not working", err)
     }
 })
+
 
 
 

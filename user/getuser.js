@@ -111,7 +111,8 @@ router.post('/updatePwd',(req,res)=>{
    
 if( api_key !=lmskey){
   res.send("Invalid api key")
-}else{
+}
+else{
   const getuserById = `select tDob from trainees  where tCnic= ${userId}`;
   const update_pwd  = `update users set pwd = ${pwd}   where userId= ${userId}`;
 
@@ -122,11 +123,16 @@ if( api_key !=lmskey){
         if (err) {
           console.log(err);
           res.sendStatus(500) //Internal Server Error
-        } else {
-          if (result){
+        } 
+        else {
+         
+          if (result.recordset.length>0){
+           
             const data = result.recordset[0]
-            if (data){
-            
+          
+           
+            if (data != undefined){
+   
               if (dob == (data.tDob).toISOString().split("T")[0]){
            
                 try{
@@ -135,8 +141,8 @@ if( api_key !=lmskey){
                       console.log(err);
                       res.sendStatus(500) //Internal Server Error
                     }else{
-                      if(result){
-
+                      if(result.rowsAffected[0]>0){
+                       
                         res.send("Success")
                       }
                     }
@@ -152,8 +158,11 @@ if( api_key !=lmskey){
           }
         }
         else{
-          res.send("No User Found")
+          res.send("No Data of Birth Found")
         }
+      }else{
+      
+        res.send("No User Found")
       } 
   
         }
