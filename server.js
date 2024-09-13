@@ -22,6 +22,19 @@ app.use('/signUp',require('./routes/signupRoutes'))
 app.use('/bk',require('./routes/getbooks'))
 app.use('/trainee',require('./routes/trainees'))
 app.use('/traineeRpt',require('./reports/traineeReports'))
+app.use('/weight',require('./routes/weight'))
+
+//====================reporting 
+
+app.use('/rpt',require('./routes/reports'))
+
+
+
+//====================================
+
+
+
+
 app.get("/", (req, res)=>{
     res.send("Welcome to CMS")
 })

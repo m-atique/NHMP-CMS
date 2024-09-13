@@ -26,6 +26,26 @@ const status = req.body.status
 
 
 
+//==========================  get trainees by course
+router.post("/getTraineesByCourse", (req, res)=>{
+    const status = req.body.status
+    const course = req.body.course
+        const q = `SELECT tCnic, tname,tRank ,tBeltno ,tHeight from trainees where status = '${status}' and tcourse =  '${course}' `
+    
+        try {
+            db.query(q,(err, result)=>{
+                if(result) { res.send(result.recordset)}
+                else {
+                    console.log("errrrrrrrr",err)
+                }
+            })
+    
+        } catch (err) {
+            console.log("query not working", err)
+        }
+    })
+//\\================================================
+
 
 router.post("/getCourseStats", (req, res)=>{
     const data = req.body

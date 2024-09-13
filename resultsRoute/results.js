@@ -37,7 +37,7 @@ VALUES
 
 //========================update punishment
 
-router.post("/updatepunishment/:id", (req, res) => {
+router.post("/updateResult/:id", (req, res) => {
     const id = req.params.id
     const data = req.body;
 
@@ -50,11 +50,12 @@ router.post("/updatepunishment/:id", (req, res) => {
                position = '${data.position}', 
                remarks = '${data.remarks}', 
                addedBy = '${data.addedBy}', 
-               addedDate = '${data.addedDate}', 
-               courseName = '${data.courseName}'
+               addedDate = '${data.addedDate}'
+               
     WHERE 
         id = '${id}'`;
 
+        console.log(q)
     try {
         db.query(q, (err, result) => {
             if (result.rowsAffected>0) {

@@ -50,13 +50,17 @@ router.post('/login',(req,res)=>{
   const {api_key} =req.headers
   const userId = req.body.id
   const pwd  = req.body.pwd
-  
+
    
 if( api_key !=lmskey){
   res.send("Invalid api key")
 }else{
-  const getuserById = `select u.id ,t.tCnic,u.pwd,u.role,t.tName,t.tCourse,t.tRank from users as u inner join trainees as t on u.userId = t.tCnic  where userId= ${userId}`;
 
+  // const getTrainee = `select u.id ,t.tCnic,u.pwd,u.role,t.tName,t.tCourse,t.tRank from users as u inner join trainees as t on u.userId = t.tCnic  where userId= ${userId}`;
+  const getTrainee = `select tCnic, tName,tCourse,tRank , message from  trainees   where tCnic= ${userId}`;
+
+
+  const getuserById = `select id, pwd,role from users  where userId= '${userId}'`;
 
   try{
       db.query(getuserById ,(err, result) => {
@@ -65,21 +69,81 @@ if( api_key !=lmskey){
           res.sendStatus(500) //Internal Server Error
         } else {
           if (result){
+       
             const data = result.recordset[0]
+            
             if (data){
               if (pwd == data.pwd){
-            const user = {
-              id:data.id,
-              name: data.tName,
-              role:data.role,
-              rank:data.tRank,
-              course:data.tCourse,
-              cnic:data.tCnic
-            }  
+
+                if(data.role == 'drill'){
+                  const user = {
+                    id:data.id,
+                    // name: data.tName,
+                    role:data.role
+                    // rank:data.tRank,
+                    // course:data.tCourse,
+                    // cnic:data.tCnic
+                  }  
+                  
+                  console.log(user)
+                const token = jwt.sign({user},api_key,{expiresIn:'8h'})
+                res.json({token})
+                }
+                else if(data.role == 'user') {
+
+
+                  db.query(getTrainee ,(err, result) => {
+                    if (err) {
+                      console.log(err);
+                      res.sendStatus(500) //Internal Server Error
+                    } else {
+                      if (result){
+                   
+                        const data2 = result.recordset[0]
+
+                        
+                        const user = {
+                          id:data.id,
+                          name: data2.tName,
+                          role:data.role,
+                          rank:data2.tRank,
+                          course:data2.tCourse,
+                          cnic:data2.tCnic,
+                          message:data2.message
+                        }  
+     
+                      
+                      const token = jwt.sign({user},api_key,{expiresIn:'8h'})
+                      res.json({token})
+
+
+
+
+
+                      }}})
+
+
+
+
+
+
+
+
+                 
+
+                }
+          //   const user = {
+          //     id:data.id,
+          //     // name: data.tName,
+          //     role:data.role
+          //     // rank:data.tRank,
+          //     // course:data.tCourse,
+          //     // cnic:data.tCnic
+          //   }  
             
-            console.log(user)
-          const token = jwt.sign({user},api_key,{expiresIn:'8h'})
-          res.json({token})
+          //   console.log(user)
+          // const token = jwt.sign({user},api_key,{expiresIn:'8h'})
+          // res.json({token})
           }
           else{
             res.send("Incorrect Password")
@@ -178,7 +242,7 @@ else{
 router.post("/verifyUser", verifyToken, (req, res) => {
   const data = req.body
 
-  console.log("verify data",data)
+
   jwt.verify(data.token, lmskey, (err, decoded) => {
       if (err) {
         return res.status(401).json({ error: "Unautherized : Invalid Token" });

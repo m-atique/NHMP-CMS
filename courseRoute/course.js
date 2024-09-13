@@ -128,4 +128,25 @@ router.patch("/updateCourse/:id", [
     }
   });
 
+  ///---------------------------------active courses
+    //-----------------------------------get all course 
+    router.get("/getCurrentCourse", (req, res) => {
+      const course = req.params.course
+  
+      const qry = `SELECT courseName from course where status = 'current'
+ `;
+    
+      try {
+        db.query(qry, (err, result) => {
+          if (err) {
+            res.sendStatus(500); // Internal Server Error
+          } else {
+            res.send(result.recordset); // OK
+          }
+        });
+      } catch (error) {
+        console.log("ALERT", error);
+      }
+    });
+
 module.exports = router

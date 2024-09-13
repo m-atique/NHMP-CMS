@@ -124,11 +124,13 @@ VALUES
     let update_Qry
     if(data.tablename=='requestedAccounts'){
       update_Qry = `UPDATE requestedAccounts set 
+      traineeId = '${data.traineeId}' ,
       status ='${data.status}'
       where tCnic =  '${id}'`;
     }
     if(data.tablename=='trainees'){
       update_Qry = `UPDATE trainees set 
+      traineeId = '${data.traineeId}' , 
       status ='${data.status}'
       where tCnic =  '${id}'`;
     }
