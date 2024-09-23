@@ -30,7 +30,7 @@ const status = req.body.status
 router.post("/getTraineesByCourse", (req, res)=>{
     const status = req.body.status
     const course = req.body.course
-        const q = `SELECT tCnic, tname,tRank ,tBeltno ,tHeight from trainees where status = '${status}' and tcourse =  '${course}' `
+        const q = `SELECT traineeId,tCnic, tname,tRank ,tBeltno ,tHeight from trainees where status = '${status}' and tcourse =  '${course}' `
     
         try {
             db.query(q,(err, result)=>{

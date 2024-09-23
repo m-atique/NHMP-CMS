@@ -158,17 +158,27 @@ try{
     router.get('/accountReq',(req,res)=>{
      
     
-        const qry = `select  'requestedAccounts' AS table_name,  req.*,ofc.region,ofc.zone,ofc.sector,ofc.beat from requestedAccounts as req
-        inner join
-        offices as ofc 
-        on req.tposting = ofc.officeId where req.status = 'Approval Pending'
+    //     const qry = `select  'requestedAccounts' AS table_name,  req.*,ofc.region,ofc.zone,ofc.sector,ofc.beat from requestedAccounts as req
+    //     inner join
+    //     offices as ofc 
+    //     on req.tposting = ofc.officeId where req.status = 'Approval Pending'
 
-		UNION ALL
+		// UNION ALL
 
-		select  'trainees' AS table_name,  t.*,ofc.region,ofc.zone,ofc.sector,ofc.beat from trainees as t
-        inner join
-        offices as ofc 
-        on t.tposting = ofc.officeId where t.status = 'Approval Pending' order by tCourse `;
+		// select  'trainees' AS table_name,  t.*,ofc.region,ofc.zone,ofc.sector,ofc.beat from trainees as t
+    //     inner join
+    //     offices as ofc 
+    //     on t.tposting = ofc.officeId where t.status = 'Approval Pending' order by tCourse `;
+
+
+
+    const qry = `select  'requestedAccounts' AS table_name,  req.* from requestedAccounts as req
+    where req.status = 'Approval Pending'
+
+UNION ALL
+
+select  'trainees' AS table_name,  t.* from trainees as t
+     where t.status = 'Approval Pending' order by tCourse `;
 
         try{
           db.query(qry,(err, result) => {
