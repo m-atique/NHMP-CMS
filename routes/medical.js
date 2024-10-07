@@ -1,14 +1,20 @@
 const express = require('express');
 const router = express.Router();
+const {verifyToken} = require('../spy/auth')
 
 const db = require('../dbconfig');
+const tms_key = process.env.KEY
 
-router.post("/addleave", (req, res)=>{
+router.post("/addMedical", verifyToken, (req, res)=>{
+    console.log("---------------------",tms_key)
     const data = req.body;
-    console.log(data);
+    const {api_key} =req.headers
+    if( api_key !=tms_key){
+      res.send("Invalid api key")
+  }else{
     
 
-    const q = `INSERT INTO leave( traineeID,startDate,endDate,days,reason,leaveType,remarks,approvedBy,addedBy, addedDate,courseName)
+    const q = `INSERT INTO leave( traineeID,startDate,endDate,days,reason,remarks,advisedBy,addedBy, courseName)
 VALUES
     (
         '${data.traineeId}', 
@@ -16,9 +22,8 @@ VALUES
         '${data.endDate}',
         '${data.days}',
         '${data.reason}',
-        '${data.leaveType}',
         '${data.remarks}',
-        '${data.approvedBy}',
+        '${data.advisedBy}',
         '${data.addedBy}',
         '${data.addedDate}',
         '${data.courseName}'
@@ -35,6 +40,9 @@ VALUES
     } catch (err) {
         console.log("query not working", err)
     }
+
+console.log(data)
+}
 })
 
 

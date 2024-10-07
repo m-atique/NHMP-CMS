@@ -102,7 +102,30 @@ GROUP BY courseName;
         }
     })
     
-
+router.post('/register',(req,res)=>{
+    const data = req.body
+    const q = `insert into trainees (tCnic,tCourseId,tcourse,pwd ) 
+    values
+     ( '${data.cnic}',
+        '${data.courseid}',
+         '${data.course}',
+        '${data.pwd}'
+        )`
+    
+    try {
+        db.query(q,(err,result)=>{
+            if (result){
+                res.send(result)
+            }
+            else{
+                console.log(err)
+            }
+        })
+        
+    } catch (error) {
+        console.log("query not working",error)
+    }
+})
 
 module.exports = router
 

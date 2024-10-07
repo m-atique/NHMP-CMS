@@ -25,6 +25,24 @@ router.get("/getuser/:id", (req, res)=>{
 })
 
 
+
+router.get("/getStaffuser/:id", (req, res)=>{
+  const userid = req.params.id
+  const q = `SELECT * from users where userId = '${userid}'`
+
+  try {
+      db.query(q,(err, result)=>{
+          if(result) { res.send(result.recordset)}
+          else {
+              console.log("errrrrrrrr",err)
+          }
+      })
+
+  } catch (err) {
+      console.log("query not working", err)
+  }
+})
+
 router.get("/getTrainee/:cnic", (req, res)=>{
   const cnic = req.params.cnic
   const q = `SELECT * from requestedAccounts where tCnic = '${cnic}'`
@@ -75,7 +93,7 @@ if( api_key !=lmskey){
             if (data){
               if (pwd == data.pwd){
 
-                if(data.role == 'drill'){
+                if(data.role == 'drill' || data.role == 'hrm' ){
                   const user = {
                     id:data.id,
                     // name: data.tName,
@@ -85,7 +103,7 @@ if( api_key !=lmskey){
                     // cnic:data.tCnic
                   }  
                   
-                  console.log(user)
+                 
                 const token = jwt.sign({user},api_key,{expiresIn:'8h'})
                 res.json({token})
                 }
@@ -115,35 +133,10 @@ if( api_key !=lmskey){
                       
                       const token = jwt.sign({user},api_key,{expiresIn:'8h'})
                       res.json({token})
-
-
-
-
-
-                      }}})
-
-
-
-
-
-
-
-
-                 
+ }}})
 
                 }
-          //   const user = {
-          //     id:data.id,
-          //     // name: data.tName,
-          //     role:data.role
-          //     // rank:data.tRank,
-          //     // course:data.tCourse,
-          //     // cnic:data.tCnic
-          //   }  
-            
-          //   console.log(user)
-          // const token = jwt.sign({user},api_key,{expiresIn:'8h'})
-          // res.json({token})
+          
           }
           else{
             res.send("Incorrect Password")

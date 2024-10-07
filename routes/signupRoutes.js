@@ -102,6 +102,9 @@ VALUES
     '${data.deputation}',
     '${data.induction}')`
   
+
+console.log(insertquery)
+
   try{
       db.query(insertquery,(err, result) => {
         if (err) {

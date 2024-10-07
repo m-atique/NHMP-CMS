@@ -23,6 +23,7 @@ app.use('/bk',require('./routes/getbooks'))
 app.use('/trainee',require('./routes/trainees'))
 app.use('/traineeRpt',require('./reports/traineeReports'))
 app.use('/weight',require('./routes/weight'))
+app.use('/medical',require('./routes/medical'))
 
 //====================reporting 
 
