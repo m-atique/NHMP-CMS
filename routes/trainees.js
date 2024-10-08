@@ -2,7 +2,9 @@ const express = require('express');
 const router = express.Router();
 const db = require('../dbconfig');
 const jwt = require('jsonwebtoken') 
+const bcrypt = require('bcryptjs');
 const {verifyToken} = require("../spy/auth")
+
 
 
 lmskey = process.env.KEY
@@ -102,29 +104,33 @@ GROUP BY courseName;
         }
     })
     
-router.post('/register',(req,res)=>{
+router.post('/register',async(req,res)=>{
     const data = req.body
+
+    const salt = await bcrypt.genSalt(10); // Generate salt (10 rounds is a good default)
+  const hashedPassword = await bcrypt.hash(data.pwd,salt); // Hash the password
+
+ 
     const q = `insert into trainees (tCnic,tCourseId,tcourse,pwd ) 
     values
      ( '${data.cnic}',
         '${data.courseid}',
          '${data.course}',
-        '${data.pwd}'
+        '${hashedPassword}'
         )`
     
-    try {
-        db.query(q,(err,result)=>{
-            if (result){
-                res.send(result)
-            }
-            else{
-                console.log(err)
-            }
-        })
-        
-    } catch (error) {
-        console.log("query not working",error)
-    }
+        try {
+            db.query(q, (err, result) => {
+                if (err) {
+                    console.error('Database error:', err);
+                    return res.status(500).json({ message: 'Database error', error: err });
+                }
+                return res.status(201).json({ message: 'Trainee registered successfully', traineeId: result.insertId });
+            });
+        } catch (error) {
+            console.error('Query execution error:', error);
+            return res.status(500).json({ message: 'Server error', error: error.message });
+        }
 })
 
 module.exports = router

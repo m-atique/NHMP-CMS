@@ -9,7 +9,7 @@ lmskey = process.env.KEY
 
 router.get("/getuser/:id", (req, res)=>{
     const userid = req.params.id
-    const q = `SELECT * from requestedAccounts where tCnic = '${userid}'`
+    const q = `SELECT tcnic from trainees where tCnic = '${userid}'`
 
     try {
         db.query(q,(err, result)=>{

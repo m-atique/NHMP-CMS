@@ -14,6 +14,8 @@ app.use('/punishment',require('./punishmentRoute/punishment'))
 app.use('/posting',require('./postingRoute/posting'))
 app.use('/register',require('./registerRoute/register'))
 
+
+
 app.use('/course',require('./courseRoute/course'))
 app.use('/reports',require('./reports/dashboard_reports'))
 app.use('/gen',require('./routes/genRoutes'))
@@ -24,6 +26,7 @@ app.use('/trainee',require('./routes/trainees'))
 app.use('/traineeRpt',require('./reports/traineeReports'))
 app.use('/weight',require('./routes/weight'))
 app.use('/medical',require('./routes/medical'))
+app.use('/userauth',require('./routes/users'))
 
 //====================reporting 
 
