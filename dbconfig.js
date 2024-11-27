@@ -1,7 +1,7 @@
 const mssql = require('mssql')
 
 const config = {
-    server: '192.168.1.103', //ip address of the mssql database
+    server: 'localhost', //ip address of the mssql database
     user: 'ATEEQ', //username to login to the database
     password: '123456', //password to login to the database
     database: 'cms', //the name of the database to connect to

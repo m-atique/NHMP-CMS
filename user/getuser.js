@@ -9,7 +9,7 @@ lmskey = process.env.KEY
 
 router.get("/getuser/:id", (req, res)=>{
     const userid = req.params.id
-    const q = `SELECT tcnic from trainees where tCnic = '${userid}'`
+    const q = `SELECT * from trainees where tCnic = '${userid}'`
 
     try {
         db.query(q,(err, result)=>{
@@ -248,3 +248,7 @@ router.post("/verifyUser", verifyToken, (req, res) => {
 
 
 module.exports = router
+
+
+
+

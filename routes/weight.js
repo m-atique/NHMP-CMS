@@ -8,7 +8,7 @@ const {verifyToken} = require("../spy/auth")
 lmskey = process.env.KEY
 
 router.post("/addWeight", (req, res) => {
-    const { courseId, traineeId,waist, kgs, grams,catagory,underweight,overweight,  addedBy } = req.body;
+    const { courseId, traineeId,waist, kgs, grams,catagory,underweight,overweight,  addedBy,date } = req.body;
 
     // Check if all required fields are provided
     if (!courseId || !traineeId || !kgs || !grams) {
@@ -16,7 +16,7 @@ router.post("/addWeight", (req, res) => {
     }
 
     const query = `
-        INSERT INTO trainee_weight (courseId, traineeId,waist, kgs, grams,catagory,underweight,overweight, addedBy)
+        INSERT INTO trainee_weight (courseId, traineeId,waist, kgs, grams,catagory,underweight,overweight, addedBy,date)
         VALUES (
         '${courseId}',
         '${traineeId}',
@@ -26,7 +26,8 @@ router.post("/addWeight", (req, res) => {
         '${catagory}',
         '${underweight}',
         '${overweight}',
-        '${addedBy}'
+        '${addedBy}',
+        '${date}'
         )
     `;
 
@@ -44,6 +45,26 @@ router.post("/addWeight", (req, res) => {
         return res.status(500).json({ error: "Server error" });
     }
 });
+
+router.delete("/deleteWeight", (req, res) => {
+    const { sno } = req.body;
+
+    // Check if 'sno' is provided
+    if (!sno) {
+        return res.status(400).json({ error: "Sno field is required" });
+    }
+
+    const query = `DELETE FROM trainee_weight WHERE sno = ${sno}`;
+
+    db.query(query, (err, result) => {
+        if (err) {
+            console.error("Error deleting data", err);
+            return res.status(500).json({ error: "Database error" });
+        }
+        res.status(200).json({ message: "Weight deleted successfully", result });
+    });
+});
+
 
 
 router.post("/getLastWeight", (req, res) => {
@@ -170,11 +191,12 @@ SET @cols = STUFF((SELECT DISTINCT ',' + QUOTENAME(CONVERT(VARCHAR(10), date, 23
 
 
 SET @query = '
-SELECT traineeId, capNo, tName, ' + @cols + '
+SELECT traineeId, capNo, tName,height ' + @cols + '
 FROM
 (
     SELECT 
         trainee_weight.traineeId, tr.traineeId AS capNo, tr.tName,
+        height,
         CONVERT(VARCHAR(10), date, 23) AS date, 
         CONCAT(''Weight: '', kgs, '' kg '', grams, '' grams'' ,'' - '', ''Waist: '', waist, '' inch'') AS weight_info
     FROM trainee_weight 

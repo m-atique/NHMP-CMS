@@ -3,98 +3,106 @@ const router = express.Router();
 
 const db = require('../dbconfig');
 
-router.post("/addleave", (req, res)=>{
-    const data = req.body;
-    console.log(data);
-    
+const { body, validationResult } = require("express-validator");
 
-    const q = `INSERT INTO leave( traineeID,startDate,endDate,days,reason,leaveType,remarks,approvedBy,addedBy, addedDate,courseName)
-VALUES
-    (
-        '${data.traineeId}', 
-        '${data.startDate}',
-        '${data.endDate}',
-        '${data.days}',
-        '${data.reason}',
-        '${data.leaveType}',
-        '${data.remarks}',
+router.post("/addoutdoor", (req, res) => {
+    const data = req.body;
+
+    const q = `
+    INSERT INTO outdoor (
+traineeId,
+date,
+startTime,
+endTime,
+remarks,
+approvedBy,
+addedBy,
+courseName,
+recStatus)
+    VALUES (
+        '${data.traineeId}',
+        ${data.date ? `'${data.date}'` : 'NULL'}, 
+         ${data.startTime ? `'${data.startTime}'` : 'NULL'}, 
+        ${data.endTime ? `'${data.endTime}'` : 'NULL'}, 
+        '${data.remarks || ''}', 
         '${data.approvedBy}',
         '${data.addedBy}',
-        '${data.addedDate}',
-        '${data.courseName}'
-        )`
+        '${data.courseName}',
+        '${data.recStatus || 'Pending'}' 
+    )`;
 
     try {
-        db.query(q,(err, result)=>{
-            if(result) { res.send(result.recordset)}
-            else {
-                console.log("data not inserted",err)
-            }
-        })
-
-    } catch (err) {
-        console.log("query not working", err)
-    }
-})
-
-
-//========================update leave
-
-router.post("/updateLeave/:id", (req, res) => {
-    const id = req.params.id
-    const data = req.body;
-
-
-    const q = `UPDATE leave 
-               SET 
-                   startDate = '${data.startDate}', 
-                   endDate = '${data.endDate}', 
-                   days = '${data.days}', 
-                   reason = '${data.reason}', 
-                   leaveType = '${data.leaveType}', 
-                   remarks = '${data.remarks}', 
-                   approvedBy = '${data.approvedBy}', 
-                   addedBy = '${data.addedBy}', 
-                   addedDate = '${data.addedDate}', 
-                   courseName = '${data.courseName}'
-               WHERE 
-                   id = '${id}'`;
-
-    try {
-       
         db.query(q, (err, result) => {
-
-            if (result.rowsAffected>0) {
-                res.send('Updated');
+            if (result) {
+                res.status(201).send({ message: "Record saved successfully", result });
             } else {
-                console.log("Data not updated", err);
+                console.error("Error saving record:", err);
+                res.status(500).send({ error: "Failed to save record" });
             }
         });
     } catch (err) {
-        console.log("Query not working", err);
+        console.error("Query execution error:", err);
+        res.status(500).send({ error: "Internal server error" });
     }
 });
 
-//====================================================
-router.get("/getTraineeLeave/:cnic", (req, res)=>{
-   const  cnic = req.params.cnic
-    const q = `SELECT * from leave where traineeId = '${cnic}' and recStatus= 'saved' `
+
+router.get("/getoutdoor", (req, res) => {
+    const q = `SELECT * FROM outdoor`;
 
     try {
-        db.query(q,(err, result)=>{
-            if(result) { res.send(result.recordset)}
-            else {
-                console.log("errrrrrrrr",err)
+        db.query(q, (err, result) => {
+            if (result) {
+                res.status(200).send(result.recordset);
+            } else {
+                console.error("Error fetching records:", err);
+                res.status(500).send({ error: "Failed to fetch records" });
             }
-        })
-
+        });
     } catch (err) {
-        console.log("query not working", err)
+        console.error("Query execution error:", err);
+        res.status(500).send({ error: "Internal server error" });
     }
-})
+});
 
 
+router.put("/updateoutdoor/:id", (req, res) => {
+    const id = req.params.id;
+    const data = req.body;
 
+    // Dynamically construct the SET clause
+    const updates = Object.keys(data)
+        .map(key => `${key} = ${data[key] === null ? 'NULL' : `'${data[key]}'`}`)
+        .join(", ");
+
+    // Check if there's anything to update
+    if (!updates) {
+        return res.status(400).send({ error: "No fields provided to update" });
+    }
+
+    const q = `
+        UPDATE outdoor
+        SET ${updates}
+        WHERE id = ${id}`;
+
+       
+    try {
+        db.query(q, (err, result) => {
+         
+            if (result && result.rowsAffected > 0) {
+                res.status(200).send({ message: "Record updated successfully" });
+            } else if (result && result.rowsAffected === 0) {
+                res.status(404).send({ error: "Record not found" });
+            } else {
+                console.error("Error updating record:", err);
+                res.status(500).send({ error: "Failed to update record" });
+            }
+        });
+    } catch (err) {
+        console.error("Query execution error:", err);
+        res.status(500).send({ error: "Internal server error" });
+    }
+});
 
 
 module.exports = router

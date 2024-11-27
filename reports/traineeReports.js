@@ -13,7 +13,7 @@ lmskey = process.env.KEY
 router.post("/ctgReport", (req, res)=>{
   const data = req.body
   const q = `SELECT * from requestedAccounts where ${data.field} = '${data.value}'`
-
+console.log(q)
   try {
       db.query(q,(err, result)=>{
           if(result) { res.send(result.recordset)}

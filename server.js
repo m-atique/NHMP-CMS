@@ -6,14 +6,31 @@ require('dotenv').config();
 app.use(bodyParser.json({limit:'50mb'}));
 app.use(cors({origin:'*'}));
 
+const path = require('path');
+const fs = require('fs');
+
+
+//------------------------------------------------------------multur and path middleware 
+const uploadFolder = path.join(__dirname, 'uploads');
+if (!fs.existsSync(uploadFolder)) {
+  fs.mkdirSync(uploadFolder);
+}
+
+// Middleware to serve uploaded files
+app.use('/uploads', express.static(uploadFolder));
+
+
+//---------------------------
+
 app.use('/users',require('./user/getuser'))
 app.use('/leave',require('./leaveRoute/leave'))
 app.use('/results',require('./resultsRoute/results'))
 app.use('/absence',require('./absenceRoute/absence'))
 app.use('/punishment',require('./punishmentRoute/punishment'))
+app.use('/osd',require('./routes/osd'))
 app.use('/posting',require('./postingRoute/posting'))
 app.use('/register',require('./registerRoute/register'))
-
+app.use('/outdoor',require('./routes/outdoor'))
 
 
 app.use('/course',require('./courseRoute/course'))
@@ -32,10 +49,8 @@ app.use('/userauth',require('./routes/users'))
 
 app.use('/rpt',require('./routes/reports'))
 
-
-
 //====================================
-
+app.use('/pdf',require('./routes/pdfloder'))
 
 
 
