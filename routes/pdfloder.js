@@ -21,19 +21,45 @@ const upload = multer({ storage });
 
 // API endpoint to upload PDF
 router.post('/upload', upload.single('pdf'), async (req, res) => {
-  try {
-    const file = req.file;
-    if (!file) return res.status(400).json({ message: 'No file uploaded' });
+    try {
 
-    // Save file path to database
-    const filePath = `/uploads/${file.filename}`;
-    await db.query('INSERT INTO shedules (path) VALUES (?)', [filePath]);
+     
+      const file = req.file;
+      const { type, courses, addedBy } = req.body; // Assuming you pass type, courses, and addedBy in the body
+  
+      if (!file) return res.status(400).json({ message: 'No file uploaded' });
+      
+      // Validate that courses and addedBy are provided
+      if (!courses || !addedBy) {
+        return res.status(400).json({ message: 'Courses and addedBy are required' });
+      }
+  
+      // Save file path to database
+      const filePath = `/uploads/${file.filename}`;
+      
+      // Insert into the uploads table
+      const query = `
+        INSERT INTO uploads (type, courses, path, added_by)
+        VALUES (
+       '${type}',
+         '${ JSON.stringify(courses)}',
+          '${filePath}',
+           '${addedBy}'
 
-    res.status(200).json({ message: 'File uploaded successfully', filePath });
-  } catch (error) {
-    console.error(error);
-    res.status(500).json({ message: 'File upload failed', error });
-  }
-});
+        )
+      `;
+
+      console.log(query)
+      
+      // Execute the query
+      await db.query(query);
+  
+      res.status(200).json({ message: 'File uploaded successfully', filePath });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ message: 'File upload failed', error });
+    }
+  });
+  
 
 module.exports = router;
