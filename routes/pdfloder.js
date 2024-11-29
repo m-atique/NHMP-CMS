@@ -2,20 +2,30 @@ const express = require('express');
 const multer = require('multer');
 const path = require('path');
 const db = require('../dbconfig');
-
+const fs = require('fs');
 const router = express.Router();
+router.use(express.urlencoded({ extended: true })); // Ensure body parsing for form-data
 
-// Configure Multer for file uploads
+
 const storage = multer.diskStorage({
   destination: (req, file, cb) => {
-    const uploadFolder = path.join(__dirname, '../uploads');
-    cb(null, uploadFolder); // Save files in the uploads folder
+const type = req.body.type
+    const uploadDir = path.join(path.dirname(__dirname), 'uploads',type);
+
+    if (!fs.existsSync(uploadDir)) {
+      fs.mkdirSync(uploadDir, { recursive: true });
+    }
+
+    cb(null, uploadDir);
   },
   filename: (req, file, cb) => {
-    const uniqueSuffix = Date.now() + '-' + file.originalname;
-    cb(null, uniqueSuffix); // Append unique timestamp to filename
-  }
+
+    const filename = `${Date.now()}-${file.originalname}`;
+    cb(null, filename);
+  },
 });
+
+
 
 const upload = multer({ storage });
 
@@ -35,21 +45,21 @@ router.post('/upload', upload.single('pdf'), async (req, res) => {
       }
   
       // Save file path to database
-      const filePath = `/uploads/${file.filename}`;
+      const filePath = `/uploads/${type}/${file.filename}`;
       
       // Insert into the uploads table
       const query = `
         INSERT INTO uploads (type, courses, path, added_by)
         VALUES (
        '${type}',
-         '${ JSON.stringify(courses)}',
+         '${ courses}',
           '${filePath}',
            '${addedBy}'
 
         )
       `;
 
-      console.log(query)
+    
       
       // Execute the query
       await db.query(query);

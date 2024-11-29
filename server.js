@@ -11,14 +11,14 @@ const fs = require('fs');
 
 
 //------------------------------------------------------------multur and path middleware 
-const uploadFolder = path.join(__dirname, 'uploads');
-if (!fs.existsSync(uploadFolder)) {
-  fs.mkdirSync(uploadFolder);
-}
+// const uploadFolder = path.join(__dirname, 'uploads');
+// if (!fs.existsSync(uploadFolder)) {
+//   fs.mkdirSync(uploadFolder);
+// }
 
-// Middleware to serve uploaded files
-app.use('/uploads', express.static(uploadFolder));
-
+// // Middleware to serve uploaded files
+// app.use('/uploads', express.static(uploadFolder));
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
 
 //---------------------------
 
