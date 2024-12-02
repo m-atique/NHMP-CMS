@@ -20,7 +20,7 @@ router.post('/login', async (req, res) => {
     res.send("Invalid api key")
   }else{
   
-    const getTrainee = `select tCnic, tName,tCourse,tRank , message from  trainees   where tCnic= ${username}`;
+    const getTrainee = `select  tCnic, tName,tCourse,tCourseId,tRank , message from  trainees   where tCnic= ${username}`;
     try {
         const result = await db.query(`SELECT pwd,role,status FROM Users WHERE UserId = ${username}`);
 
@@ -72,12 +72,13 @@ router.post('/login', async (req, res) => {
                     // role:data.role,
                     rank:data2.tRank,
                     course:data2.tCourse,
+                    courseId:data2.tCourseId,
                     cnic:data2.tCnic,
                     message:data2.message
                   }  
 
 
-                 
+                 console.log("user",data2)
                 
                 const token = jwt.sign({user},api_key,{expiresIn:'8h'})
              

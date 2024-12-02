@@ -20,6 +20,10 @@ router.get("/dsrReport", (req, res) => {
     COALESCE(t.female, 0) AS female,
     COALESCE(l.on_leave, 0) AS on_leave,
     COALESCE(a.absent, 0) AS absent,
+    COALESCE(m.medical, 0) AS medical,
+    COALESCE(o.outdoor, 0) AS outdoor,
+    COALESCE(osd.osd, 0) AS osd,
+
     (COALESCE(t.reported, 0) - COALESCE(a.absent, 0) - COALESCE(l.on_leave, 0)) as present
 FROM 
     course c
@@ -38,6 +42,18 @@ LEFT JOIN
     (SELECT courseName, COUNT(*) AS absent 
      FROM absence 
      GROUP BY courseName) a ON c.courseName = a.courseName
+     LEFT JOIN 
+    (SELECT courseName, COUNT(*) AS medical 
+     FROM medical 
+     GROUP BY courseName) m ON c.courseName = m.courseName
+     LEFT JOIN 
+    (SELECT courseName, COUNT(*) AS outdoor 
+     FROM outdoor 
+     GROUP BY courseName) o ON c.courseName = o.courseName
+     LEFT JOIN 
+    (SELECT courseName, COUNT(*) AS osd 
+     FROM osd 
+     GROUP BY courseName) osd ON c.courseName = osd.courseName
 WHERE 
     c.status = 'current'
 `;

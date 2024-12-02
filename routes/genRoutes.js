@@ -121,7 +121,7 @@ router.post("/getLPR/", async(req, res)=>{
       const p = `SELECT * from punishment where traineeId = '${cnic}'   `
       const o = `SELECT * from osd where traineeId = '${cnic}'   `
       const m = `SELECT * from medical where traineeId = '${cnic}'   `
-
+const out = `SELECT * from outdoor where traineeId = '${cnic}'   `
 
    try {
 
@@ -132,7 +132,7 @@ router.post("/getLPR/", async(req, res)=>{
     const punishments = await db.query(p)
     const osd = await db.query(o)
     const medical = await db.query(m)
-
+    const outdoor = await db.query(out)
 
     res.send({
       leave:leaves.recordset,
@@ -140,7 +140,8 @@ router.post("/getLPR/", async(req, res)=>{
       punishments:punishments.recordset,
       results:result.recordset,
       osd:osd.recordset,
-      medical:medical.recordset
+      medical:medical.recordset,
+      outdoor:outdoor.recordset
     })
    } catch (err) {
        console.log("query not working", err)

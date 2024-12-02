@@ -18,7 +18,9 @@ const fs = require('fs');
 
 // // Middleware to serve uploaded files
 // app.use('/uploads', express.static(uploadFolder));
-app.use('/uploads', express.static(path.join(__dirname, 'uploads')))
+app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads', 'BookCovers')))
+
+// router.use('/covers', express.static(path.join(__dirname, '..', 'uploads', 'BookCovers')));
 
 //---------------------------
 
