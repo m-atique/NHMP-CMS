@@ -10,7 +10,7 @@ const {verifyToken} = require("../spy/auth")
 lmskey = process.env.KEY
 
 router.post('/login', async (req, res) => {
-    
+ 
     const { username, password } = req.body;
     const {api_key} =req.headers
  
@@ -78,7 +78,7 @@ router.post('/login', async (req, res) => {
                   }  
 
 
-                 console.log("user",data2)
+                 console.log("user")
                 
                 const token = jwt.sign({user},api_key,{expiresIn:'8h'})
              

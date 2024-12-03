@@ -74,62 +74,57 @@ router.post('/upload', upload.single('pdf'), async (req, res) => {
 // API to fetch uploaded files by course
 router.get('/getfiles/:course/:type', async (req, res) => {
   try {
-    const { course,type } = req.params;
+    const { course, type } = req.params;
 
     // Fetch files for the specified course
     const query = `
-    SELECT *
-FROM uploads
-WHERE type = '${type}' and ',' + courses + ',' LIKE '%,${course},%';
+      SELECT *
+      FROM uploads
+      WHERE type = '${type}' AND ',' + courses + ',' LIKE '%,${course},%';
     `;
 
     const result = await db.query(query);
 
-    if (result.length === 0) {
+    // Check if any files were found
+    if (result.recordset.length === 0) {
       return res.status(404).json({ message: 'No files found for the given course' });
     }
 
-    // res.status(200).json(result.recordset );
+    const pdfs = result.recordset;
+    const pdfData = pdfs.map((item) => {
+      const relativePath = item.path; // e.g., "uploads/Book/1733117156377-Abc.pdf"
+      const filePath = path.join(__dirname, '../', relativePath);
 
-    const pdfs = result.recordset 
-    const pdfDAta = pdfs.map(item=>{ 
-      
+      // Check if the file exists
+      if (!fs.existsSync(filePath)) {
+        // Return error for missing file (optional: log it for debugging)
+        console.error(`File not found: ${filePath}`);
+        return null; // Filter out missing files
+      }
 
-      //==============================converting to base64
-      const relativePath = item.path; // This will capture "uploads/Book/1733117156377-Abc.pdf"
-  const filePath = path.join(__dirname, '../', relativePath); // Adjust the path based on your folder structure
+      // Read the file and encode it as base64
+      const fileBuffer = fs.readFileSync(filePath);
+      const base64Data = fileBuffer.toString('base64');
 
-    // Check if the file exists
-    if (!fs.existsSync(filePath)) {
-      return res.status(404).json({ message: 'File not found' });
-    }
+      // Create the Data URL format
+      const fileType = 'application/pdf';
+      const dataUrl = `data:${fileType};base64,${base64Data}`;
 
-    // Read the file and encode it as base64
-    const fileBuffer = fs.readFileSync(filePath);
-    const base64Data = fileBuffer.toString('base64');
-
-    // Create the Data URL format
-    const fileType = 'application/pdf'; // Adjust this if serving other file types
-    const dataUrl = `data:${fileType};base64,${base64Data}`; 
-      
-      
-      
-      
-      
-      return{id:item.id,
-        endDate:item.date,
+      return {
+        id: item.id,
+        endDate: item.date,
         title: path.basename(item.path).split("-")[1].split(".")[0],
-        pdf:dataUrl
-      }})
+        pdf: dataUrl,
+      };
+    }).filter(item => item !== null); // Filter out null entries for missing files
 
-
-    res.status(200).json(pdfDAta );
+    // Send the response
+    res.status(200).json(pdfData);
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Error fetching files', error });
   }
 });
-
 
 // Serve the file by path
 router.get('/openfile/*', (req, res) => {
