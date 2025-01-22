@@ -5,7 +5,10 @@ const app = express();
 require('dotenv').config();
 app.use(bodyParser.json({limit:'50mb'}));
 app.use(cors({origin:'*'}));
-
+app.use((req, res, next) => {
+    console.log(`Received request: ${req.method} ${req.url}`);
+    next();
+  });
 const path = require('path');
 const fs = require('fs');
 
@@ -19,7 +22,7 @@ const fs = require('fs');
 // // Middleware to serve uploaded files
 // app.use('/uploads', express.static(uploadFolder));
 app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads', 'BookCovers')))
-
+app.use('/public', express.static(path.join(__dirname, 'uploads')));
 // router.use('/covers', express.static(path.join(__dirname, '..', 'uploads', 'BookCovers')));
 
 //---------------------------
@@ -46,14 +49,15 @@ app.use('/traineeRpt',require('./reports/traineeReports'))
 app.use('/weight',require('./routes/weight'))
 app.use('/medical',require('./routes/medical'))
 app.use('/userauth',require('./routes/users'))
-
+app.use('/subjects',require('./routes/subjects'))
 //====================reporting 
 
 app.use('/rpt',require('./routes/reports'))
 
 //====================================
 app.use('/pdf',require('./routes/pdfloder'))
-
+//========================staff
+app.use('/staff',require('./routes/staff'))
 
 
 app.get("/", (req, res)=>{

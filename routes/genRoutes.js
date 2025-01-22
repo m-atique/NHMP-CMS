@@ -230,5 +230,40 @@ router.post("/getRecord/:id", (req, res)=>{
  })
  
 
+ router.get("/getProvince", (req, res) => {
+  try {
+    const qry = `SELECT distinct province from prv_dist`;
+
+    db.query(qry,(err, result)=>{
+      if(result ) { res.send(result.recordset)}
+      else {
+          console.log("errrrrrrrr",err)
+      }
+  })
+
+  } catch (error) {
+    console.log("ALERT", error);
+    
+  }
+ })
+
+ router.get("/getDistrict/:province", (req, res) => {
+  try {
+
+    const province = req.params.province
+    const qry = `SELECT distinct district from prv_dist where province = '${province}'`;
+
+    db.query(qry,(err, result)=>{
+      if(result ) { res.send(result.recordset)}
+      else {
+          console.log("errrrrrrrr",err)
+      }
+  })
+
+  } catch (error) {
+    console.log("ALERT", error);
+    
+  }
+ })
 
 module.exports = router;

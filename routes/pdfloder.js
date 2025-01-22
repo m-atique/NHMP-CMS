@@ -36,7 +36,7 @@ router.post('/upload', upload.single('pdf'), async (req, res) => {
 
      
       const file = req.file;
-      const { type, courses, addedBy } = req.body; // Assuming you pass type, courses, and addedBy in the body
+      const { type,startDate,endDate,subjectId, courses, addedBy } = req.body; // Assuming you pass type, courses, and addedBy in the body
   
       if (!file) return res.status(400).json({ message: 'No file uploaded' });
       
@@ -50,9 +50,13 @@ router.post('/upload', upload.single('pdf'), async (req, res) => {
       
       // Insert into the uploads table
       const query = `
-        INSERT INTO uploads (type, courses, path, added_by)
+        INSERT INTO uploads (type,startDate, endDate,subjectId, status, courses, path, added_by)
         VALUES (
        '${type}',
+  ${startDate ? `'${startDate}'` : 'NULL'}, 
+  ${endDate ? `'${endDate}'` : 'NULL'}, 
+  ${subjectId ? `'${subjectId}'` : 'NULL'}, 
+'Active',
          '${ courses}',
           '${filePath}',
            '${addedBy}'
@@ -72,7 +76,7 @@ router.post('/upload', upload.single('pdf'), async (req, res) => {
   });
   
 // API to fetch uploaded files by course
-router.get('/getfiles/:course/:type', async (req, res) => {
+router.get('/getfiles/:course', async (req, res) => {
   try {
     const { course, type } = req.params;
 
@@ -80,9 +84,10 @@ router.get('/getfiles/:course/:type', async (req, res) => {
     const query = `
       SELECT *
       FROM uploads
-      WHERE type = '${type}' AND ',' + courses + ',' LIKE '%,${course},%';
+      WHERE ',' + courses + ',' LIKE '%,${course},%';
     `;
-
+    // type = '${type}' AND 
+    
     const result = await db.query(query);
 
     // Check if any files were found
@@ -93,8 +98,16 @@ router.get('/getfiles/:course/:type', async (req, res) => {
     const pdfs = result.recordset;
     const pdfData = pdfs.map((item) => {
       const relativePath = item.path; // e.g., "uploads/Book/1733117156377-Abc.pdf"
+      const folder =item.path.split("/")[2]
+      const type = item.path.split(".")[1]
       const filePath = path.join(__dirname, '../', relativePath);
 
+     
+
+
+
+
+ const fileUri = `${process.env.BASE_URL}${relativePath.replace(/\\/g,'/')}`
       // Check if the file exists
       if (!fs.existsSync(filePath)) {
         // Return error for missing file (optional: log it for debugging)
@@ -102,7 +115,7 @@ router.get('/getfiles/:course/:type', async (req, res) => {
         return null; // Filter out missing files
       }
 
-      // Read the file and encode it as base64
+      //Read the file and encode it as base64
       const fileBuffer = fs.readFileSync(filePath);
       const base64Data = fileBuffer.toString('base64');
 
@@ -112,102 +125,87 @@ router.get('/getfiles/:course/:type', async (req, res) => {
 
       return {
         id: item.id,
+        folder:folder,
+        type:type,
         endDate: item.date,
         title: path.basename(item.path).split("-")[1].split(".")[0],
-        pdf: dataUrl,
+        filepath:fileUri,
+        // pdf: dataUrl,
       };
-    }).filter(item => item !== null); // Filter out null entries for missing files
+    }).filter(item => item !== null) // Filter out null entries for missing files
 
     // Send the response
-    res.status(200).json(pdfData);
+    res.status(200).json(pdfData)
   } catch (error) {
     console.error(error);
     res.status(500).json({ message: 'Error fetching files', error });
   }
 });
 
-// Serve the file by path
-router.get('/openfile/*', (req, res) => {
-  // Extract the relative path from the URL
-  try{
-  const relativePath = req.params[0]; // This will capture "uploads/Book/1733117156377-Abc.pdf"
-  const filePath = path.join(__dirname, '../', relativePath); // Adjust the path based on your folder structure
 
-    // Check if the file exists
-    if (!fs.existsSync(filePath)) {
-      return res.status(404).json({ message: 'File not found' });
+router.get('/getfilesByType/:course/:type', async (req, res) => {
+  try {
+    const { course, type } = req.params;
+
+    // Fetch files for the specified course
+    const query = `
+      SELECT *
+      FROM uploads
+      WHERE ',' + courses + ',' LIKE '%,${course},%' and type = '${type}' and endDate >= getdate();
+    `;
+    //  AND 
+    
+    const result = await db.query(query);
+
+    // Check if any files were found
+    if (result.recordset.length === 0) {
+      return res.status(404).json({ message: 'No files found for the given course' });
     }
 
-    // Read the file and encode it as base64
-    const fileBuffer = fs.readFileSync(filePath);
-    const base64Data = fileBuffer.toString('base64');
+    const pdfs = result.recordset;
+    const pdfData = pdfs.map((item) => {
+      const relativePath = item.path; // e.g., "uploads/Book/1733117156377-Abc.pdf"
+      const folder =item.path.split("/")[2]
+      const type = item.path.split(".")[1]
+      const filePath = path.join(__dirname, '../', relativePath);
 
-    // Create the Data URL format
-    const fileType = 'application/pdf'; // Adjust this if serving other file types
-    const dataUrl = `data:${fileType};base64,${base64Data}`;
+     
 
-    res.status(200).json({ pdf: dataUrl });
+
+
+
+ const fileUri = `${process.env.BASE_URL}${relativePath.replace(/\\/g,'/')}`
+      // Check if the file exists
+      if (!fs.existsSync(filePath)) {
+        // Return error for missing file (optional: log it for debugging)
+        console.error(`File not found: ${filePath}`);
+        return null; // Filter out missing files
+      }
+
+      //Read the file and encode it as base64
+      const fileBuffer = fs.readFileSync(filePath);
+      const base64Data = fileBuffer.toString('base64');
+
+      // Create the Data URL format
+      const fileType = 'application/pdf';
+      const dataUrl = `data:${fileType};base64,${base64Data}`;
+
+      return {
+        id: item.id,
+        folder:folder,
+        type:type,
+        endDate: item.date,
+        title: path.basename(item.path).split("-")[1].split(".")[0],
+        filepath:fileUri,
+        // pdf: dataUrl,
+      };
+    }).filter(item => item !== null) // Filter out null entries for missing files
+
+    // Send the response
+    res.status(200).json(pdfData)
   } catch (error) {
-    console.error('Error serving file as base64:', error);
-    res.status(500).json({ message: 'Error processing file', error });
+    console.error(error);
+    res.status(500).json({ message: 'Error fetching files', error });
   }
 });
-
-
-
-
-
-// router.get('/getbooks', async (req, res) => {
-//   try {
-//     // Fetch the books from the database
-//     const query = `SELECT * FROM uploads WHERE type = 'Book'`;
-//     const result = await db.query(query);
-
-//     if (result.recordset.length === 0) {
-//       return res.status(404).json({ message: 'No books found' });
-//     }
-
-//     // Process each book entry to generate the thumbnail if it doesn't exist
-//     const books = await Promise.all(
-//       result.recordset.map(async (item) => {
-//         const filePath = path.join(__dirname, '../..', item.path);
-//         const thumbnailPath = path.join(__dirname, '../..', 'uploads', 'BookCovers', `${path.basename(item.path)}.jpg`);
-
-//         // Generate thumbnail if it doesn't exist
-//         if (!fs.existsSync(thumbnailPath)) {
-//           await generateThumbnail(filePath, thumbnailPath); // Generate and save thumbnail
-//         }
-
-//         // Return metadata along with thumbnail URL
-//         return {
-//           id: item.id,
-//           title: path.basename(item.path).split('-')[1].split('.')[0],
-//           courses: item.courses,
-//           thumbnail: `/covers/${path.basename(item.path)}.jpg`, // Thumbnail URL
-//         };
-//       })
-//     );
-
-//     res.status(200).json(books);
-//   } catch (error) {
-//     console.error(error);
-//     res.status(500).json({ message: 'Error fetching books', error });
-//   }
-// });
-
-// // Function to generate a thumbnail from the PDF
-// const generateThumbnail = async (pdfPath, thumbnailPath) => {
-//   try {
-//     const pdfBuffer = fs.readFileSync(pdfPath);
-//     const pdfDoc = await PDFDocument.load(pdfBuffer);
-//     const page = pdfDoc.getPage(0); // Get the first page
-
-//     // Render first page as image (this requires PDF-to-image conversion)
-//     const imageBuffer = await page.renderToImage(); // Implement using your PDF library
-//     await sharp(imageBuffer).resize(200, 200).toFile(thumbnailPath); // Resize and save thumbnail
-//   } catch (error) {
-//     console.error('Error generating thumbnail:', error);
-//   }
-// };
-
 module.exports = router;
