@@ -1,6 +1,7 @@
 const express = require("express")
 const bodyParser = require("body-parser")
 const cors = require("cors")
+const db = require('./dbconfig');
 const app = express();
 require('dotenv').config();
 app.use(bodyParser.json({limit:'50mb'}));
@@ -11,6 +12,7 @@ app.use((req, res, next) => {
   });
 const path = require('path');
 const fs = require('fs');
+const schedule = require("node-schedule");
 
 
 //------------------------------------------------------------multur and path middleware 
@@ -59,6 +61,11 @@ app.use('/pdf',require('./routes/pdfloder'))
 //========================staff
 app.use('/staff',require('./routes/staff'))
 
+
+
+
+
+//==============================
 
 app.get("/", (req, res)=>{
     res.send("Welcome to CMS")
