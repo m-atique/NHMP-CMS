@@ -8,7 +8,7 @@ router.post("/addAbsence", (req, res)=>{
     console.log(data);
     
 
-    const q = `INSERT INTO absence( traineeID,startDate,endDate,days,reason,remarks,addedBy, addedDate,courseName)
+    const q = `INSERT INTO absence( traineeID,startDate,endDate,days,reason,remarks,addedBy, courseName)
 VALUES
     (
         '${data.traineeId}', 
@@ -18,7 +18,7 @@ VALUES
         '${data.reason}',
         '${data.remarks}',
         '${data.addedBy}',
-        '${data.addedDate}',
+      
          '${data.courseName}'
         )`
 
@@ -50,7 +50,6 @@ router.post("/updateAbsence/:id", (req, res) => {
                    reason = '${data.reason}', 
                    remarks = '${data.remarks}', 
                    addedBy = '${data.addedBy}', 
-                   addedDate = '${data.addedDate}', 
                    courseName = '${data.courseName}'
     WHERE 
         id = '${id}'`;

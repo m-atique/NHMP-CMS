@@ -95,6 +95,7 @@ router.patch("/updateCourse/:id", [
       router.get("/getCourse/:course", (req, res) => {
         const course = req.params.course
 
+        console.log(course)
         const qry = `SELECT * from course where courseName = '${course}'`;
       
         try {

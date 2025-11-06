@@ -8,7 +8,7 @@ router.post("/addPunishment", (req, res)=>{
     // console.log(data);
     
 
-    const q = `INSERT INTO punishment( traineeID,punishment,days,reason,remarks, orderBy, addedBy, addedDate,courseName)
+    const q = `INSERT INTO punishment( traineeID,punishment,days,reason,remarks, orderBy, addedBy, courseName)
 VALUES
     (
         '${data.traineeId}', 
@@ -18,7 +18,6 @@ VALUES
         '${data.remarks}',
         '${data.orderBy}',
         '${data.addedBy}',
-        '${data.addedDate}',
         '${data.courseName}'
         )`
 
@@ -49,8 +48,7 @@ router.post("/updatePunishment/:id", (req, res) => {
         reason = '${data.reason}', 
         remarks = '${data.remarks}', 
         orderBy = '${data.orderBy}', 
-        addedBy = '${data.addedBy}', 
-        addedDate = '${data.addedDate}', 
+        addedBy = '${data.addedBy}',  
         courseName = '${data.courseName}'
     WHERE 
         id = '${id}'`;

@@ -14,7 +14,7 @@ const type = req.body.type
     const uploadDir = path.join(path.dirname(__dirname), 'uploads',type);
 
     if (!fs.existsSync(uploadDir)) {
-      fs.mkdirSync(uploadDir, { recursive: true });
+      fs.mkdirSync(uploadDir, { recursive: false });
     }
 
     cb(null, uploadDir);
@@ -76,7 +76,7 @@ router.post('/upload', upload.single('pdf'), async (req, res) => {
   });
   
 // API to fetch uploaded files by course
-router.get('/getfiles/:course', async (req, res) => {
+router.get('/getfiles/:course/:type', async (req, res) => {
   try {
     const { course, type } = req.params;
 
@@ -84,11 +84,14 @@ router.get('/getfiles/:course', async (req, res) => {
     const query = `
       SELECT *
       FROM uploads
-      WHERE ',' + courses + ',' LIKE '%,${course},%';
+      WHERE type = '${type}' AND  ',' + courses + ',' LIKE '%,${course},%';
     `;
-    // type = '${type}' AND 
+    // 
     
     const result = await db.query(query);
+
+
+  
 
     // Check if any files were found
     if (result.recordset.length === 0) {
@@ -103,11 +106,13 @@ router.get('/getfiles/:course', async (req, res) => {
       const filePath = path.join(__dirname, '../', relativePath);
 
      
+      
+      
+      
+      const fileUri = `${'http://116.0.45.12:9898'}${relativePath.replace(/\\/g,'/')}`
+      
+      console.log("ccc--------------------------------------------",filePath,fileUri)
 
-
-
-
- const fileUri = `${process.env.BASE_URL}${relativePath.replace(/\\/g,'/')}`
       // Check if the file exists
       if (!fs.existsSync(filePath)) {
         // Return error for missing file (optional: log it for debugging)
@@ -174,7 +179,7 @@ router.get('/getfilesByType/:course/:type', async (req, res) => {
 
 
 
- const fileUri = `${process.env.BASE_URL}${relativePath.replace(/\\/g,'/')}`
+ const fileUri = `${'http://116.0.45.12:9898'}${relativePath.replace(/\\/g,'/')}`
       // Check if the file exists
       if (!fs.existsSync(filePath)) {
         // Return error for missing file (optional: log it for debugging)

@@ -7,7 +7,7 @@ require('dotenv').config();
 app.use(bodyParser.json({limit:'50mb'}));
 app.use(cors({origin:'*'}));
 app.use((req, res, next) => {
-    console.log(`Received request: ${req.method} ${req.url}`);
+    // console.log(`Received request: ${req.method} ${req.url}`);
     next();
   });
 const path = require('path');
@@ -25,6 +25,8 @@ const schedule = require("node-schedule");
 // app.use('/uploads', express.static(uploadFolder));
 app.use('/uploads', express.static(path.join(__dirname, '..', 'uploads', 'BookCovers')))
 app.use('/public', express.static(path.join(__dirname, 'uploads')));
+app.use("/trainee_photos", express.static(path.join(__dirname, "trainee_photos")));
+
 // router.use('/covers', express.static(path.join(__dirname, '..', 'uploads', 'BookCovers')));
 
 //---------------------------
@@ -52,6 +54,8 @@ app.use('/weight',require('./routes/weight'))
 app.use('/medical',require('./routes/medical'))
 app.use('/userauth',require('./routes/users'))
 app.use('/subjects',require('./routes/subjects'))
+app.use('/pms',require('./routes/pms'))
+app.use('/dawai',require('./routes/dawai'))
 //====================reporting 
 
 app.use('/rpt',require('./routes/reports'))
@@ -61,11 +65,30 @@ app.use('/pdf',require('./routes/pdfloder'))
 //========================staff
 app.use('/staff',require('./routes/staff'))
 
+app.use('/gdrive',require('./spy/upload_drive'))
 
-
-
+app.use('/weekend',require('./routes/weekend'))
 
 //==============================
+
+const cron = require("node-cron");
+const axios = require("axios"); // to call your own API route
+
+// Schedule job every day at 11:59 PM
+cron.schedule("41 14 * * *", async () => {
+  try {
+    console.log("⏰ Running daily backup job at 11:59 PM...");
+
+    // Call your API route
+    const res = await axios.post("http://localhost:5002/gdrive/upload-backup");
+    console.log("✅ Backup job response:", res.data);
+  } catch (error) {
+    console.error("❌ Backup job failed:", error.message);
+  }
+});
+
+
+//===========================================
 
 app.get("/", (req, res)=>{
     res.send("Welcome to CMS")

@@ -179,12 +179,7 @@ try{
 
 
 
-    const qry = `select  'requestedAccounts' AS table_name,  req.* from requestedAccounts as req
-    where req.status = 'Approval Pending'
-
-UNION ALL
-
-select  'trainees' AS table_name,  t.* from trainees as t
+    const qry = `select  'trainees' AS table_name,  t.* from trainees as t
      where t.status = 'Approval Pending' order by tCourse `;
 
         try{

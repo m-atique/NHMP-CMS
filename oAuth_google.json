@@ -1,0 +1,13 @@
+{
+    "web": {
+        "client_id": "764272830995-h626264haohk50k48pg0vqfba7arijjd.apps.googleusercontent.com",
+        "project_id": "nhmptms",
+        "auth_uri": "https://accounts.google.com/o/oauth2/auth",
+        "token_uri": "https://oauth2.googleapis.com/token",
+        "auth_provider_x509_cert_url": "https://www.googleapis.com/oauth2/v1/certs",
+        "client_secret": "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",
+        "redirect_uris": [
+            "http://localhost:5002/oauth2callback"
+        ]
+    }
+}

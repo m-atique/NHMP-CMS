@@ -8,7 +8,7 @@ router.post("/addleave", (req, res)=>{
     console.log(data);
     
 
-    const q = `INSERT INTO leave( traineeID,startDate,endDate,days,reason,leaveType,remarks,approvedBy,addedBy, addedDate,courseName)
+    const q = `INSERT INTO leave( traineeID,startDate,endDate,days,reason,leaveType,remarks,approvedBy,addedBy,courseName)
 VALUES
     (
         '${data.traineeId}', 
@@ -20,7 +20,7 @@ VALUES
         '${data.remarks}',
         '${data.approvedBy}',
         '${data.addedBy}',
-        '${data.addedDate}',
+       
         '${data.courseName}'
         )`
 
@@ -55,7 +55,6 @@ router.post("/updateLeave/:id", (req, res) => {
                    remarks = '${data.remarks}', 
                    approvedBy = '${data.approvedBy}', 
                    addedBy = '${data.addedBy}', 
-                   addedDate = '${data.addedDate}', 
                    courseName = '${data.courseName}'
                WHERE 
                    id = '${id}'`;

@@ -1,7 +1,7 @@
 const express = require("express");
 const db = require('../dbconfig');
 const router = express.Router();
-
+const axios = require('axios');
 
 
 lmskey = process.env.KEY;
@@ -266,4 +266,38 @@ router.post("/getRecord/:id", (req, res)=>{
   }
  })
 
+
+
+ router.post("/getInfo_nrdla", async (req, res) => {
+
+   const { cnic } = req.body;
+
+  const externalApiUrl = 'https://nrdla.punjab.gov.pk/api/tracking_user_nhmp';
+
+
+  try {
+    const response = await axios.post(externalApiUrl, 
+      {
+        SearchType:1,
+        cnic:cnic
+      },
+      {
+      
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization':`Basic ${Buffer.from('nhmp:@nhmp!$').toString('base64')}`,
+        'Hash_key': 1234
+      }
+      
+    });
+if(response.data.data.length > 0){
+  const info = response.data.data.find((item)=> item.Province == 'NHMP');
+
+    info?res.send(info):res.send(response.data.data[0]);
+}
+  } catch (error) {
+    console.log("Error fetching data from external API", error);
+    res.sendStatus(500); // Internal Server Error
+  }
+});
 module.exports = router;

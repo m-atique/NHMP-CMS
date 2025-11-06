@@ -1,0 +1,12 @@
+{
+  "editor.fontFamily": "'Fira Code', Consolas, 'Courier New', monospace",
+  "editor.fontLigatures": true,
+  "editor.fontSize": 16,
+  "editor.lineHeight": 24,
+  "editor.fontWeight": "500",
+  "workbench.colorTheme": "Andromeda Italic Bordered",      
+  "workbench.iconTheme": "vs-seti",
+  "editor.cursorBlinking": "smooth",
+  "editor.cursorWidth": 2,
+  "editor.minimap.enabled": false
+}

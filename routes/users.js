@@ -14,18 +14,18 @@ router.post('/login', async (req, res) => {
     const { username, password } = req.body;
     const {api_key} =req.headers
  
-  
+  console.log(username)
      
   if( api_key !=lmskey){
     res.send("Invalid api key")
   }else{
   
-    const getTrainee = `select  tCnic, tName,tCourse,tCourseId,tRank , message from  trainees   where tCnic= ${username}`;
+    const getTrainee = `select  tCnic, tName,tCourse,tCourseId,tRank , message from  trainees   where tCnic= '${username}'`;
     try {
-        const result = await db.query(`SELECT pwd,role,status FROM Users WHERE UserId = ${username}`);
+        const result = await db.query(`SELECT pwd,role,status FROM Users WHERE UserId = '${username}'`);
 
         const data = result.recordset[0];
-        
+        console.log("data",data)
         
         if (!data) {
           
@@ -42,7 +42,7 @@ router.post('/login', async (req, res) => {
         
       
         // Generate JWT token
-        if(data.role == 'drill' || data.role == 'hrm' ){
+        if(data.role == 'drill' || data.role == 'hrm' || data.role == 'staff' ){
             const user = {
               id:data.id,
               // name: data.tName,
@@ -68,17 +68,17 @@ router.post('/login', async (req, res) => {
                   const data2 = result.recordset[0]
                   const user = {
                     
-                    name: data2.tName,
+                    name: data2?.tName,
                     // role:data.role,
-                    rank:data2.tRank,
-                    course:data2.tCourse,
-                    courseId:data2.tCourseId,
-                    cnic:data2.tCnic,
-                    message:data2.message
+                    rank:data2?.tRank,
+                    course:data2?.tCourse,
+                    courseId:data2?.tCourseId,
+                    cnic:data2?.tCnic,
+                    message:data2?.message
                   }  
 
 
-                 console.log("user")
+            
                 
                 const token = jwt.sign({user},api_key,{expiresIn:'8h'})
              

@@ -8,7 +8,7 @@ const {verifyToken} = require("../spy/auth")
 lmskey = process.env.KEY
 
 router.post("/addWeight", (req, res) => {
-    const { courseId, traineeId,waist, kgs, grams,catagory,underweight,overweight,  addedBy,date } = req.body;
+    const { courseId, traineeId,waist, kgs, grams,height,catagory,underweight,overweight,  addedBy,date } = req.body;
 
     // Check if all required fields are provided
     if (!courseId || !traineeId || !kgs || !grams) {
@@ -16,7 +16,7 @@ router.post("/addWeight", (req, res) => {
     }
 
     const query = `
-        INSERT INTO trainee_weight (courseId, traineeId,waist, kgs, grams,catagory,underweight,overweight, addedBy,date)
+        INSERT INTO trainee_weight (courseId, traineeId,waist, kgs, grams,catagory,underweight,overweight, addedBy,date,height)
         VALUES (
         '${courseId}',
         '${traineeId}',
@@ -27,7 +27,8 @@ router.post("/addWeight", (req, res) => {
         '${underweight}',
         '${overweight}',
         '${addedBy}',
-        '${date}'
+        '${date}',
+        '${height}'
         )
     `;
 
@@ -38,6 +39,12 @@ router.post("/addWeight", (req, res) => {
                 console.error("Error inserting data", err);
                 return res.status(500).json({ error: "Database error" });
             }
+
+            try {
+                db.query(`update trainees set theight = '${height}'  where tCnic = '${traineeId}'` )
+            } catch (error) {
+                console.log(error)
+            }
             res.status(200).json({ message: "Weight added successfully", result });
         });
     } catch (err) {
@@ -45,6 +52,12 @@ router.post("/addWeight", (req, res) => {
         return res.status(500).json({ error: "Server error" });
     }
 });
+
+
+
+
+
+
 
 router.delete("/deleteWeight", (req, res) => {
     const { sno } = req.body;
@@ -74,6 +87,34 @@ router.post("/getLastWeight", (req, res) => {
 
     const query = `
         select top 1 * from trainee_weight  where courseid = '${courseId}' and traineeId = '${traineeId}' order by sno   desc 
+    `;
+
+
+
+    try {
+        db.query(query, (err, result) => {
+            if (err) {
+                console.error("Error inserting data", err);
+                return res.status(500).json({ error: "Database error" });
+            }
+            res.status(200).json( result.recordset );
+        });
+    } catch (err) {
+        console.error("Query execution failed", err);
+        return res.status(500).json({ error: "Server error" });
+    
+}
+});
+
+
+
+router.post("/getWeightHistory", (req, res) => {
+    const { courseId, traineeId } = req.body;
+
+   
+
+    const query = `
+        select * from trainee_weight  where courseid = '${courseId}' and traineeId = '${traineeId}' order by sno   desc 
     `;
 
 
@@ -179,37 +220,49 @@ router.post("/getpdfReport", (req, res) => {
 
 
 
-const query = `DECLARE @cols AS NVARCHAR(MAX),
-        @query AS NVARCHAR(MAX);
+const query = `
 
+DECLARE @cols NVARCHAR(MAX),
+        @query NVARCHAR(MAX);
 
-SET @cols = STUFF((SELECT DISTINCT ',' + QUOTENAME(CONVERT(VARCHAR(10), date, 23))
-                   FROM trainee_weight
-                   FOR XML PATH(''), TYPE
-                  ).value('.', 'NVARCHAR(MAX)') 
-                  ,1,1,'');
+-- Build the list of columns (dates) ONLY for courseId = 5046 and where data is not null
+SET @cols = STUFF(( 
+    SELECT DISTINCT ',' + QUOTENAME(CONVERT(VARCHAR(10), tw.[date], 23))
+    FROM trainee_weight tw
+    WHERE tw.courseId = ${courseId}
+      AND (tw.kgs IS NOT NULL OR tw.grams IS NOT NULL OR tw.waist IS NOT NULL)
+    FOR XML PATH(''), TYPE
+).value('.', 'NVARCHAR(MAX)'), 1, 1, '');
 
-
+-- Build dynamic query
 SET @query = '
-SELECT traineeId, capNo, tName,height ' + @cols + '
+SELECT traineeId, capNo, tName, height, ' + @cols + '
 FROM
 (
     SELECT 
-        trainee_weight.traineeId, tr.traineeId AS capNo, tr.tName,
-        height,
-        CONVERT(VARCHAR(10), date, 23) AS date, 
-        CONCAT(''Weight: '', kgs, '' kg '', grams, '' grams'' ,'' - '', ''Waist: '', waist, '' inch'') AS weight_info
-    FROM trainee_weight 
-    INNER JOIN trainees AS tr ON tr.tCnic = trainee_weight.traineeId where courseId = ${courseId}
+        tw.traineeId,
+        tr.traineeId AS capNo,
+        tr.tName,
+        tw.height,
+
+        CONVERT(VARCHAR(10), tw.date, 23) AS [date],
+        CONCAT(''Weight: '', tw.kgs, '' kg '', tw.grams, '' grams - Waist: '', tw.waist, '' inch'',''-'',''Category: '',tw.catagory) AS weight_info
+    FROM trainee_weight tw
+    INNER JOIN trainees tr ON tr.tCnic = CONVERT(VARCHAR, tw.traineeId)
+    WHERE tw.courseId = ${courseId}
+      AND (tw.kgs IS NOT NULL OR tw.grams IS NOT NULL OR tw.waist IS NOT NULL)
 ) AS SourceTable
 PIVOT
 (
-    MAX(weight_info) FOR date IN (' + @cols + ')
+    MAX(weight_info) FOR [date] IN (' + @cols + ')
 ) AS PivotTable
-ORDER BY traineeId, capNo, tName;';
+ORDER BY capNo,traineeId,  tName;
+';
 
--- Execute the dynamic SQL query
-EXEC sp_executesql @query`
+-- Execute
+EXEC sp_executesql @query
+
+ `
 
 
     try {

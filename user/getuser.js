@@ -3,13 +3,14 @@ const router = express.Router();
 const db = require('../dbconfig');
 const jwt = require('jsonwebtoken') 
 const {verifyToken} = require("../spy/auth")
+const bcrypt = require('bcryptjs');
 
 
 lmskey = process.env.KEY
 
 router.get("/getuser/:id", (req, res)=>{
     const userid = req.params.id
-    const q = `SELECT * from trainees where tCnic = '${userid}'`
+    const q = `SELECT t.*,o.* from trainees t left join offices o on o.officeId = t.tPosting where tCnic = '${userid}'`
 
     try {
         db.query(q,(err, result)=>{
@@ -75,7 +76,7 @@ if( api_key !=lmskey){
 }else{
 
   // const getTrainee = `select u.id ,t.tCnic,u.pwd,u.role,t.tName,t.tCourse,t.tRank from users as u inner join trainees as t on u.userId = t.tCnic  where userId= ${userId}`;
-  const getTrainee = `select tCnic, tName,tCourse,tRank , message from  trainees   where tCnic= ${userId}`;
+  const getTrainee = `select  tCnic, tName,tCourse,tRank , message from  trainees   where tCnic= '${userId}'`;
 
 
   const getuserById = `select id, pwd,role from users  where userId= '${userId}'`;
@@ -122,12 +123,12 @@ if( api_key !=lmskey){
                         
                         const user = {
                           id:data.id,
-                          name: data2.tName,
-                          role:data.role,
-                          rank:data2.tRank,
-                          course:data2.tCourse,
-                          cnic:data2.tCnic,
-                          message:data2.message
+                          name: data2?.tName,
+                          role:data?.role,
+                          rank:data2?.tRank,
+                          course:data2?.tCourse,
+                          cnic:data2?.tCnic,
+                          message:data2?.message
                         }  
      
                       
@@ -158,20 +159,28 @@ if( api_key !=lmskey){
 
 
 
-router.post('/updatePwd',(req,res)=>{
+router.post('/updatePwd',async(req,res)=>{
 
  
   const {api_key} =req.headers
   const userId = req.body.cnic
   const pwd  = req.body.pwd
   const dob  = req.body.dob
+
+
+
+
+   const salt = await bcrypt.genSalt(10); // Generate salt (10 rounds)
+    
+
+      const hashedPassword = await bcrypt.hash(pwd, salt);
    
 if( api_key !=lmskey){
   res.send("Invalid api key")
 }
 else{
-  const getuserById = `select tDob from trainees  where tCnic= ${userId}`;
-  const update_pwd  = `update users set pwd = ${pwd}   where userId= ${userId}`;
+  const getuserById = `select tDob from trainees  where tCnic= '${userId}'`;
+  const update_pwd  = `update users set pwd = '${hashedPassword}'   where userId= '${userId}'`;
 
 
 
@@ -189,10 +198,11 @@ else{
           
            
             if (data != undefined){
-   
-              if (dob == (data.tDob).toISOString().split("T")[0]){
-           
+   if(!data?.tDob){
+ res.send("Your Date of birth not found")
+   }else if (dob == (data?.tDob).toISOString().split("T")[0]){
                 try{
+           
                   db.query(update_pwd ,(err, result) => {
                     if (err) {
                       console.log(err);
@@ -225,6 +235,7 @@ else{
         }
       });
     } catch (error) {
+      res.send("Can't update Password contact support")
       console.log("ALERT",error) 
      }
    
