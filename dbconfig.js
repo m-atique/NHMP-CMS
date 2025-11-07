@@ -2,10 +2,10 @@ const mssql = require('mssql')
 
 const config = {
     server: 'localhost', //ip address of the mssql database
-    user: 'admin', //username to login to the database
-    password: '123456', //password to login to the database
+    user: 'sa', //username to login to the database
+    password: 'itwing@1234', //password to login to the database
     database: 'cms', //the name of the database to connect to
-    port: 1434, //OPTIONAL, port of the database on the server
+    port: 1433, //OPTIONAL, port of the database on the server
     // timeout: 5, //OPTIONAL, login timeout for the server
     options: {
         trustedconnection: true,

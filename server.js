@@ -69,6 +69,7 @@ app.use('/gdrive',require('./spy/upload_drive'))
 
 app.use('/weekend',require('./routes/weekend'))
 
+app.use('/staff_leave',require('./leaveRoute/staff_leave'))
 //==============================
 
 const cron = require("node-cron");
